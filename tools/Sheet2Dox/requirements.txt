@@ -1,0 +1,6 @@
+pandas
+python-docx
+requests
+pillow
+pymupdf
+reportlab
