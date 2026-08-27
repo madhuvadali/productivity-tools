@@ -82,11 +82,11 @@ from docx.shared import Inches, Pt
 # ==========================================================================
 CONFIG = {
     # The long ID from your Google Sheet's URL (between /d/ and /edit)
-    "sheet_id": "PASTE_YOUR_GOOGLE_SHEET_ID_HERE",
+    "sheet_id": "1ffkoSIuMEzn1e2ZD24oosEII3TOQ76RFV0bzNi31HHI",
 
     # Optional: the gid= number if your data isn't on the first tab.
     # Leave as None to use the first/default tab.
-    "gid": None,
+    "gid": 1418612790,
 
     # Every column (exact header text from row 1 of your sheet) you want
     # printed on each candidate's page, in the order they should appear.
@@ -101,12 +101,15 @@ CONFIG = {
     # sheet's header text:
     #     {"header": "Roll No", "label": "Roll Number"},
     "text_columns": [
-        "Name",
-        "ID",
+        "Name as per Bank Account",
+        "Name of Bank",
+        "Bank Account Number",
+        "Bank IFSC code",
+        "PAN details",
     ],
 
     # The column holding the Google Drive link to the ID scan.
-    "link_column": "Link",
+    "link_column": "Upload clear copy of PAN card in jpg or PDF format",
 
     # Base name (no extension) for the generated file(s). If --format is
     # "both", you'll get <output_base>.docx AND <output_base>.pdf.

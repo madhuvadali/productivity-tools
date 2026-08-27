@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Local PDF Merger</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #111826;
+      --muted: #98a2b3;
+      --text: #e5e7eb;
+      --accent: #60a5fa;
+      --accent-2: #22d3ee;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: linear-gradient(180deg, #0b1020, #0b0f14 40%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 24px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .app {
+      max-width: 920px;
+      margin: 0 auto 48px;
+      padding: 16px;
+    }
+
+    .card {
+      background: rgba(17, 24, 38, 0.9);
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+      overflow: hidden;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    @media(min-width:900px) {
+      .grid {
+        grid-template-columns: 1.1fr .9fr;
+      }
+    }
+
+    .dropzone {
+      border: 2px dashed rgba(96, 165, 250, .5);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      transition: .2s;
+      background: rgba(2, 6, 23, .4);
+    }
+
+    .dropzone.dragover {
+      background: rgba(2, 6, 23, .75);
+      border-color: var(--accent-2);
+      box-shadow: 0 0 0 3px rgba(34, 211, 238, .25) inset;
+    }
+
+    .dropzone input {
+      display: none;
+    }
+
+    .dz-title {
+      font-size: 18px;
+      margin: 8px 0 4px;
+    }
+
+    .dz-sub {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(96, 165, 250, .35);
+      color: var(--text);
+      background: linear-gradient(180deg, rgba(96, 165, 250, .15), rgba(96, 165, 250, .05));
+      cursor: pointer;
+      font-weight: 600;
+      user-select: none;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(180deg, #3b82f6, #2563eb);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border-color: rgba(148, 163, 184, .35);
+    }
+
+    .btn.danger {
+      background: linear-gradient(180deg, rgba(239, 68, 68, .85), rgba(185, 28, 28, .9));
+      border-color: transparent;
+    }
+
+    .btn:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .list {
+      background: rgba(2, 6, 23, .5);
+      border: 1px solid rgba(148, 163, 184, .15);
+      border-radius: 14px;
+      padding: 8px;
+      max-height: 420px;
+      overflow: auto;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, .12);
+      margin: 8px;
+      background: rgba(15, 23, 42, .55);
+    }
+
+    .row .meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .name {
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .info {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+    }
+
+    .footer {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px 20px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .progress {
+      height: 10px;
+      background: rgba(148, 163, 184, .2);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #60a5fa, #22d3ee);
+      transition: width .25s ease;
+    }
+
+    .kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: rgba(148, 163, 184, .15);
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, .25);
+    }
+
+    .pill {
+      padding: 6px 10px;
+      background: rgba(148, 163, 184, .15);
+      border: 1px solid rgba(148, 163, 184, .25);
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .stack {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Local PDF Merger</h1>
+    <div class="sub">Merge multiple PDFs into a single document — all in your browser, no upload.</div>
+  </header>
+
+  <main class="app">
+    <div class="card">
+      <div class="grid">
+        <!-- Left: Input / Drop -->
+        <section>
+          <div id="dropzone" class="dropzone" tabindex="0">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" style="width:42px;height:42px;opacity:.9">
+              <path d="M7 15l5-5 5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                stroke-linejoin="round" />
+              <path d="M12 10v9" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+              <rect x="3" y="3" width="18" height="6" rx="2.5" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+            <div class="dz-title">Drop PDFs here</div>
+            <div class="dz-sub">or</div>
+            <div style="margin-top:10px">
+              <label class="btn" for="file">Choose files</label>
+              <input id="file" type="file" accept="application/pdf" multiple />
+            </div>
+            <div class="hint" style="margin-top:12px">Tip: You can select several at once. Use <span
+                class="kbd">↑</span>/<span class="kbd">↓</span> buttons to reorder.</div>
+          </div>
+
+          <div style="margin-top:16px" class="stack">
+            <span class="pill" id="countPill">0 files</span>
+            <span class="pill" id="pagesPill" title="Total pages (after reading)">– pages</span>
+            <span class="pill" id="sizePill">0 MB</span>
+          </div>
+
+          <div style="margin-top:14px" class="progress" aria-hidden="true">
+            <div class="bar" id="bar"></div>
+          </div>
+        </section>
+
+        <!-- Right: List & Actions -->
+        <section>
+          <div class="list" id="list" aria-live="polite"></div>
+          <div class="footer">
+            <div class="stack">
+              <button class="btn ghost" id="clearBtn" title="Remove all">Clear</button>
+              <button class="btn" id="sortNameBtn" title="Sort by name">Sort A→Z</button>
+              <button class="btn" id="sortDateBtn" title="Sort by last modified">Sort by time</button>
+            </div>
+            <div class="stack">
+              <input id="outName" value="merged.pdf"
+                style="background:transparent;border:1px solid rgba(148,163,184,.35); color:var(--text); padding:10px 12px; border-radius:10px; width:190px" />
+              <button class="btn primary" id="mergeBtn" title="Merge to a single PDF">Merge</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <section style="max-width:920px; margin:18px auto 0; color:var(--muted); font-size:13px; line-height:1.6">
+      <details>
+        <summary><strong>Offline usage</strong> (no internet)</summary>
+        <ol>
+          <li>Download <code>pdf-lib.min.js</code> (UMD build) from the PDF-LIB project and place it next to this
+            <code>index.html</code>.</li>
+          <li>Uncomment the <code>pdf-lib.min.js</code> script tag in the code (near the bottom) and remove the CDN line
+            if present.</li>
+          <li>Open this HTML file in Chrome/Edge. Everything runs locally in your browser.</li>
+        </ol>
+      </details>
+    </section>
+  </main>
+
+  <!-- Load PDF-LIB (choose ONE of these): -->
+  <!-- Option A: LOCAL (offline). Put pdf-lib.min.js next to this file and uncomment: -->
+  <!-- <script src="./pdf-lib.min.js"></script> -->
+
+  <!-- Option B: CDN (simple; needs internet the first time): -->
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+  <script>
+    (function () {
+      const { PDFDocument } = window.pdfLib || {};
+      if (!PDFDocument) { alert('PDF-LIB failed to load. If you want offline use, download pdf-lib.min.js and use the local script tag.'); }
+
+      /*** State ***/
+      /** @type {{file: File, name: string, size: number, lastModified: number, pages: number|null}[]} */
+      let items = [];
+
+      const els = {
+        dz: document.getElementById('dropzone'),
+        file: document.getElementById('file'),
+        list: document.getElementById('list'),
+        bar: document.getElementById('bar'),
+        countPill: document.getElementById('countPill'),
+        pagesPill: document.getElementById('pagesPill'),
+        sizePill: document.getElementById('sizePill'),
+        clearBtn: document.getElementById('clearBtn'),
+        sortNameBtn: document.getElementById('sortNameBtn'),
+        sortDateBtn: document.getElementById('sortDateBtn'),
+        mergeBtn: document.getElementById('mergeBtn'),
+        outName: document.getElementById('outName'),
+      };
+
+      /*** Helpers ***/
+      const fmtBytes = b => (b / 1024 / 1024).toFixed(2) + ' MB';
+
+      function updatePills() {
+        els.countPill.textContent = items.length + (items.length === 1 ? ' file' : ' files');
+        const total = items.reduce((a, b) => a + b.size, 0);
+        els.sizePill.textContent = fmtBytes(total);
+        const knownPages = items.map(x => x.pages || 0).reduce((a, b) => a + b, 0);
+        els.pagesPill.textContent = knownPages ? knownPages + ' pages' : '– pages';
+      }
+
+      function renderList() {
+        updatePills();
+        els.list.innerHTML = '';
+        if (!items.length) {
+          els.list.innerHTML = '<div style="padding:12px; color:var(--muted)">No files yet. Add some PDFs to begin.</div>';
+          return;
+        }
+        items.forEach((it, idx) => {
+          const row = document.createElement('div');
+          row.className = 'row';
+          row.innerHTML = `
+          <div class="meta">
+            <div class="name" title="${it.name}">📄 ${it.name}</div>
+            <div class="info">${fmtBytes(it.size)} • ${it.pages ? it.pages + ' pages' : 'pages: …'} • ${new Date(it.lastModified).toLocaleString()}</div>
+          </div>
+          <div class="controls">
+            <button class="btn" data-act="up" title="Move up">↑</button>
+            <button class="btn" data-act="down" title="Move down">↓</button>
+            <button class="btn danger" data-act="remove" title="Remove">Remove</button>
+          </div>`;
+          row.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const act = btn.getAttribute('data-act');
+              if (act === 'remove') { items.splice(idx, 1); renderList(); }
+              if (act === 'up' && idx > 0) { const t = items[idx]; items[idx] = items[idx - 1]; items[idx - 1] = t; renderList(); }
+              if (act === 'down' && idx < items.length - 1) { const t = items[idx]; items[idx] = items[idx + 1]; items[idx + 1] = t; renderList(); }
+            });
+          });
+          els.list.appendChild(row);
+        });
+      }
+
+      async function readPageCounts(newItems) {
+        // Best-effort: parse each PDF once to learn page counts (for the pill)
+        for (let i = 0; i < newItems.length; i++) {
+          try {
+            const arr = new Uint8Array(await newItems[i].file.arrayBuffer());
+            const pdf = await PDFDocument.load(arr, { ignoreEncryption: true });
+            newItems[i].pages = pdf.getPageCount();
+          } catch (e) { /* ignore */ }
+        }
+      }
+
+      async function addFiles(fileList) {
+        const pdfs = [...fileList].filter(f => f && f.type === 'application/pdf');
+        const newItems = pdfs.map(f => ({ file: f, name: f.name, size: f.size, lastModified: f.lastModified, pages: null }));
+        await readPageCounts(newItems);
+        items = items.concat(newItems);
+        renderList();
+      }
+
+      /*** Events: dropzone ***/
+      ;['dragenter', 'dragover'].forEach(ev => {
+        els.dz.addEventListener(ev, e => { e.preventDefault(); els.dz.classList.add('dragover'); });
+      });
+      ;['dragleave', 'drop'].forEach(ev => {
+        els.dz.addEventListener(ev, e => { e.preventDefault(); els.dz.classList.remove('dragover'); });
+      });
+      els.dz.addEventListener('drop', e => { addFiles(e.dataTransfer.files); });
+      els.file.addEventListener('change', e => addFiles(e.target.files));
+
+      els.clearBtn.addEventListener('click', () => { items = []; renderList(); });
+      els.sortNameBtn.addEventListener('click', () => { items.sort((a, b) => a.name.localeCompare(b.name)); renderList(); });
+      els.sortDateBtn.addEventListener('click', () => { items.sort((a, b) => a.lastModified - b.lastModified); renderList(); });
+
+      els.mergeBtn.addEventListener('click', async () => {
+        if (!items.length) return alert('Add at least one PDF.');
+        els.mergeBtn.disabled = true; els.mergeBtn.textContent = 'Merging…';
+        els.bar.style.width = '0%';
+        try {
+          const out = await PDFDocument.create();
+          let done = 0; const failed = [];
+          for (const it of items) {
+            try {
+              const bytes = new Uint8Array(await it.file.arrayBuffer());
+              const src = await PDFDocument.load(bytes, { ignoreEncryption: true });
+              const pages = src.getPageIndices();
+              if (!pages.length) throw new Error('No pages');
+              const copied = await out.copyPages(src, pages);
+              copied.forEach(p => out.addPage(p));
+            } catch (e) {
+              console.error('Failed on', it.name, e);
+              failed.push(it.name);
+            }
+            done++;
+            els.bar.style.width = Math.round(100 * done / items.length) + '%';
+          }
+          if (out.getPageCount() === 0) {
+            throw new Error('No pages could be merged. Likely all PDFs are encrypted or corrupted.');
+          }
+
+          const mergedBytes = await out.save({ addDefaultPage: false });
+          const blob = new Blob([mergedBytes], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = (els.outName.value || 'merged.pdf').replace(/\s+/g, '_');
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 10_000);
+        } catch (err) {
+          console.error(err);
+          alert('Failed to merge. If one of the PDFs is encrypted or corrupted, try removing it.');
+        } finally {
+          els.mergeBtn.disabled = false; els.mergeBtn.textContent = 'Merge';
+          els.bar.style.width = '0%';
+        }
+      });
+
+      // Init
+      renderList();
+    })();
+  </script>
+</body>
+
+</html>
