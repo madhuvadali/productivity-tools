@@ -104,31 +104,16 @@ async function init(){
   mapFilter.build();
 
   await mapReady;
-  map.addSource('ms',{type:'geojson',data:fc([]),cluster:true,clusterMaxZoom:9,clusterRadius:40});
-  map.addLayer({id:'clusters',type:'circle',source:'ms',filter:['has','point_count'],paint:{
-    'circle-color':'#0f6e6a','circle-opacity':0.85,'circle-stroke-color':'#fff','circle-stroke-width':2,
-    'circle-radius':['step',['get','point_count'],14,10,18,30,23,80,28]}});
-  map.addLayer({id:'cluster-count',type:'symbol',source:'ms',filter:['has','point_count'],
-    layout:{'text-field':['get','point_count_abbreviated'],'text-font':['Noto Sans Bold'],'text-size':12,'text-allow-overlap':true},
-    paint:{'text-color':'#fff'}});
+  map.addSource('ms',{type:'geojson',data:fc([])});
   map.addLayer({id:'ms-sel',type:'circle',source:'ms',filter:['==',['get','id'],-1],paint:{
     'circle-radius':13,'circle-color':'#fff','circle-stroke-color':'#1f2328','circle-stroke-width':2}});
-  map.addLayer({id:'ms-pts',type:'circle',source:'ms',filter:['!',['has','point_count']],paint:{
+  map.addLayer({id:'ms-pts',type:'circle',source:'ms',paint:{
     'circle-radius':7,'circle-color':['get','color'],'circle-stroke-color':'#fff','circle-stroke-width':1.5,
     'circle-opacity':['case',['get','approx'],0.45,1],'circle-stroke-opacity':['case',['get','approx'],0.6,1]}});
 
   map.on('click','ms-pts',e=>select(e.features[0].properties.id,false));
-  map.on('click','clusters',async e=>{
-    const f=e.features[0];
-    try{
-      const z=await map.getSource('ms').getClusterExpansionZoom(f.properties.cluster_id);
-      map.easeTo({center:f.geometry.coordinates,zoom:z+0.3,duration:500});
-    }catch(err){ map.easeTo({center:f.geometry.coordinates,zoom:map.getZoom()+2}); }
-  });
-  for(const l of ['ms-pts','clusters']){
-    map.on('mouseenter',l,()=>map.getCanvas().style.cursor='pointer');
-    map.on('mouseleave',l,()=>map.getCanvas().style.cursor='');
-  }
+  map.on('mouseenter','ms-pts',()=>map.getCanvas().style.cursor='pointer');
+  map.on('mouseleave','ms-pts',()=>map.getCanvas().style.cursor='');
   render(true);
 }
 
@@ -204,8 +189,19 @@ function fitPadding(){
 
 function renderChips(){
   const counts={}; data.forEach(d=>{ if(matches(d,'type')) counts[d.type]=(counts[d.type]||0)+1; });
-  $('types').innerHTML=allTypes.map(t=>`<button class="chip" data-t="${esc(t)}" aria-pressed="${activeTypes.has(t)}" style="--c:${colorOf(t)}">
-    <span class="dot" aria-hidden="true"></span><span>${esc(t)}</span><span class="n">${counts[t]||0}</span></button>`).join('');
+  const existing=!!$('types').children.length;
+  if(existing){
+    // keep the existing checkboxes (and focus) in place; just sync state and counts
+    $('types').querySelectorAll('.chip').forEach(chip=>{
+      const t=chip.dataset.t, cb=chip.querySelector('input');
+      cb.checked=activeTypes.has(t);
+      chip.querySelector('.n').textContent=counts[t]||0;
+    });
+    return;
+  }
+  $('types').innerHTML=allTypes.map((t,i)=>`<label class="chip" data-t="${esc(t)}" style="--c:${colorOf(t)}">
+    <input type="checkbox" id="chip-${i}" ${activeTypes.has(t)?'checked':''}>
+    <span class="dot" aria-hidden="true"></span><span>${esc(t)}</span><span class="n">${counts[t]||0}</span></label>`).join('');
 }
 function renderStateBars(){
   const counts={}; data.forEach(d=>{ if(d.state&&matches(d,'place')) counts[d.state]=(counts[d.state]||0)+1; });
@@ -257,13 +253,12 @@ $('city').addEventListener('change',()=>render(true));
 $('sort').addEventListener('change',()=>render(false));
 $('exact').addEventListener('change',()=>render(false));
 document.querySelectorAll('.conf').forEach(c=>c.addEventListener('change',()=>render(false)));
-$('types').addEventListener('click',e=>{
-  const c=e.target.closest('.chip'); if(!c)return;
+$('types').addEventListener('change',e=>{
+  const cb=e.target; const c=cb.closest('.chip'); if(!c)return;
   const t=c.dataset.t;
-  if(activeTypes.has(t)){ activeTypes.delete(t); if(!activeTypes.size) activeTypes=new Set(allTypes); }
-  else activeTypes.add(t);
+  if(cb.checked) activeTypes.add(t);
+  else { activeTypes.delete(t); if(!activeTypes.size) activeTypes=new Set(allTypes); }
   render(true);
-  const again=document.querySelector(`.chip[data-t="${CSS.escape(t)}"]`); if(again)again.focus();
 });
 $('state-bars').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b)return;
