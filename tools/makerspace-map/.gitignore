@@ -1,0 +1,10 @@
+# personal/registration data — never commit
+databases/IAMS-2025 Participant Information.xlsx
+databases/IDEA Labs Contacts.xlsx
+
+# local caches and internal working files — not needed in version control
+databases/.geocode_cache.json
+databases/fablabs_io_india_raw.json
+databases/OperationalATLsInIndia.pdf
+databases/TODO.csv
+scripts/__pycache__/

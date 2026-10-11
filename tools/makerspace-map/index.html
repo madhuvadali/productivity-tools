@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>India Makerspace Map</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <header>
+      <h1>India Makerspaces</h1>
+      <p id="count" class="muted"></p>
+    </header>
+    <div class="controls">
+      <input id="search" type="search" placeholder="Search name, city, description…" autocomplete="off">
+      <select id="state"><option value="">All states</option></select>
+      <select id="city"><option value="">All cities</option></select>
+      <div id="types" class="chips"></div>
+      <button id="reset" class="link">Reset filters</button>
+    </div>
+    <ul id="list"></ul>
+    <div class="foot"><span class="fade"></span> faded dot = approximate location · <a href="databases/SOURCES.md" target="_blank">Data sources &amp; methods</a></div>
+  </aside>
+  <main id="map"></main>
+</div>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

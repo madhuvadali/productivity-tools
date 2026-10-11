@@ -1,0 +1,103 @@
+﻿fid,name,fablabs_io_status,decision,fablabs_io_url,action_needed,action_priority
+1,FABLAB KERALA - Trivandrum,active,duplicate of government_prototyping_hubs (FabLab Kerala - Thiruvananthapuram),https://www.fablabs.io/labs/fablabkeralatrivandrum,No action (covered in another file),Low
+2,Sanjivani Fab Lab,active,"included (medium, active)",https://www.fablabs.io/labs/sanjivanifablab,See action in fablabs_checked.csv,Low
+3,FabLab Nagpur,active,"included (high, active)",https://www.fablabs.io/labs/fablabnagpur,See action in fablabs_checked.csv,Low
+4,KIIT TBI FABLAB,active,duplicate of incubators_with_makerspaces (KIIT-TBI),https://www.fablabs.io/labs/kiittbi,No action (covered in another file),Low
+5,"IoT & Fab Lab, NSUT (formerly NSIT)",unknown,"included (medium, active)",https://www.fablabs.io/labs/netajisubhasinstituteoftechnology,See action in fablabs_checked.csv,Low
+6,"4i Lab, IIT Kanpur",unknown,"included (medium, listed)",https://www.fablabs.io/labs/indianinstituteoftechnology,See action in fablabs_checked.csv,Low
+7,AIC-RNTU i4 Lab (FabLab),active,"included (medium, active)",https://www.fablabs.io/labs/aicrntu,See action in fablabs_checked.csv,Low
+8,Heera College Of Engineering and Technology-FABLAB,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/hcet,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+9,VASCSC FabLab,active,"included (low, unverified)",https://www.fablabs.io/labs/vascscfablab,See action in fablabs_checked.csv,Low
+10,Maker Auto,active,"excluded: mobile lab, no fixed location - not mapped",https://www.fablabs.io/labs/makerauto,No action unless new evidence appears,Low
+11,Sathyabama TBI InnoSpace,active,"included (low, unverified)",https://www.fablabs.io/labs/sathyabamatbi,See action in fablabs_checked.csv,Low
+12,KIET TBI PRAYAS SHALA FabLab,active,"included (low, unverified)",https://www.fablabs.io/labs/KIETTBIPRAYASSHALAFabLab,See action in fablabs_checked.csv,Low
+13,Shishuvan Makerspace,active,"included (medium, active)",https://www.fablabs.io/labs/makerspaceshishuvanschool,See action in fablabs_checked.csv,Low
+14,StoryOfMakers,active,"included (low, unverified)",https://www.fablabs.io/labs/storyofmakers,See action in fablabs_checked.csv,Low
+15,HiCET Fab Labz,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/hicetfablabz,Listed as 'planned': re-check in a year whether it opened,Low
+16,Mini Fablab Kerala SNGCE,active,duplicate of government_prototyping_hubs (SNGCE FabLab),https://www.fablabs.io/labs/minifablabkeralasngce,No action (covered in another file),Low
+17,Workbench Projects,active,duplicate of community_makerspaces_checked (Workbench Projects),https://www.fablabs.io/labs/workbenchprojects,No action (covered in another file),Low
+18,REVA FABLAB,active,duplicate of incubators_with_makerspaces (REVA Fab Lab),https://www.fablabs.io/labs/REVA,No action (covered in another file),Low
+19,MakersBox,active,duplicate of community_makerspaces_checked (MakersBox),https://www.fablabs.io/labs/makersbox,No action (covered in another file),Low
+20,Maker's Asylum Delhi,closed,excluded: FabLabs.io status 'closed',https://www.fablabs.io/labs/delhi,No action (closed),Low
+21,Maker's Asylum,active,duplicate of community_makerspaces_checked (Maker's Asylum),https://www.fablabs.io/labs/makersasylum,No action (covered in another file),Low
+22,Lal Bahadur Shastri Mini Fab Lab Kasaragod,active,duplicate of government_prototyping_hubs (LBS FabLab),https://www.fablabs.io/labs/lbsfablab,No action (covered in another file),Low
+23,Mini FabLab FISAT,active,duplicate of government_prototyping_hubs (FISAT FabLab),https://www.fablabs.io/labs/fablabfisat,No action (covered in another file),Low
+24,Fablab Narmadalaya,active,"included (low, unverified)",https://www.fablabs.io/labs/fablabnarmadalaya,See action in fablabs_checked.csv,Low
+25,FabLab Madurai,active,"moved to government_prototyping_hubs (included (low, unverified))",https://www.fablabs.io/labs/fablabmadurai,No action (covered in another file),Low
+26,Tata Centre for Technology and Design (TCTD),active,"included (low, unverified)",https://www.fablabs.io/labs/tctd,See action in fablabs_checked.csv,Low
+27,Artilab Foundation,active,"included (low, unverified)",https://www.fablabs.io/labs/artilabfoundation,See action in fablabs_checked.csv,Low
+28,FORT Chennai - Fablab Chennai,active,"moved to government_prototyping_hubs (included (low, unverified))",https://www.fablabs.io/labs/fabforgesrp,No action (covered in another file),Low
+29,Logicbrigade,active,excluded: logicbrigade.com now redirects to a domain-for-sale page - treated as closed,https://www.fablabs.io/labs/aimslogicbrigade,No action (closed),Low
+30,EnCube Labs,active,"included (low, unverified)",https://www.fablabs.io/labs/EnCube,See action in fablabs_checked.csv,Low
+31,InThinks,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/inthinksfablab,Listed as 'planned': re-check in a year whether it opened,Low
+32,INIFD Pune Kothrud,active,"included (low, doubtful)",https://www.fablabs.io/labs/inifdpune,See action in fablabs_checked.csv,Low
+33,"Fablab,Noida",active,"included (low, unverified)",https://www.fablabs.io/labs/rentechnologies01,See action in fablabs_checked.csv,Low
+34,FabLabz,active,"included (low, unverified)",https://www.fablabs.io/labs/fablabz,See action in fablabs_checked.csv,Low
+35,"Mini Fab Lab Kerala - GEC, Thrissur",planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/gectfablab,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+36,FabLab Salem (Innovate TN Lab),active,"moved to government_prototyping_hubs (included (medium, active))",https://www.fablabs.io/labs/fablabsalem,No action (covered in another file),Low
+37,FabLab Trichy (Innovate TN Lab),active,"moved to government_prototyping_hubs (included (medium, active))",https://www.fablabs.io/labs/fablabtrichy,No action (covered in another file),Low
+38,Mini Fab Lab Saintgits,active,duplicate of government_prototyping_hubs (Saintgits FabLab),https://www.fablabs.io/labs/fablabsaintgits,No action (covered in another file),Low
+39,Fab Lab Parul University,active,"included (low, unverified)",https://www.fablabs.io/labs/fablabpu,See action in fablabs_checked.csv,Low
+40,FabLab Nellai (Innovate TN Lab),active,"moved to government_prototyping_hubs (included (high, active))",https://www.fablabs.io/labs/fablabnellai,No action (covered in another file),Low
+41,FORT Hosur - Fablab Hosur,active,"moved to government_prototyping_hubs (included (medium, active))",https://www.fablabs.io/labs/fabforgehosur,No action (covered in another file),Low
+42,"College of Engineering, Pune",unknown,"included (low, unverified)",https://www.fablabs.io/labs/collegeofengineeringpune,See action in fablabs_checked.csv,Low
+43,FabLab Parul University Vadodara,active,duplicate of fablabs (duplicate of Parul entry 39),https://www.fablabs.io/labs/fablabVadodara,No action (covered in another file),Low
+44,Digilab,active,"included (low, unverified)",https://www.fablabs.io/labs/digilab,See action in fablabs_checked.csv,Low
+45,36 Inc Fablab,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/36incfablab,Listed as 'planned': re-check in a year whether it opened,Low
+46,Zios Makerspace,active,"included (high, active)",https://www.fablabs.io/labs/panchkula,See action in fablabs_checked.csv,Low
+47,Makerspace @ CMRIT,active,"included (medium, uncertain)",https://www.fablabs.io/labs/makerspacecmrit,See action in fablabs_checked.csv,Low
+48,"Innovation Lab, Palnar",closed,excluded: FabLabs.io status 'closed',https://www.fablabs.io/labs/innovationlabpalnar,No action (closed),Low
+49,SSET FABERSPACE,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/ssetfaberspace,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+50,INIFD Kondhawa,active,"included (low, doubtful)",https://www.fablabs.io/labs/inifdkondhawa,See action in fablabs_checked.csv,Low
+51,FABMAT,active,"included (medium, uncertain)",https://www.fablabs.io/labs/fabmatjaipur,See action in fablabs_checked.csv,Low
+52,Mini Fablab JECC,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/jeccfablab,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+53,Peza FabLab,active,"included (low, unverified)",https://www.fablabs.io/labs/pezafablab,See action in fablabs_checked.csv,Low
+54,Fab Lab STPI Bhubaneswar,active,duplicate of government_prototyping_hubs (STPI Bhubaneswar),https://www.fablabs.io/labs/fablabstpibhubaneswar,No action (covered in another file),Low
+55,Makers Hive,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/makershive,Listed as 'planned': re-check in a year whether it opened,Low
+56,Mini Fablab RIT,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/minifablabrit,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+57,National Innovation Foundation -India (NIF),active,duplicate of government_prototyping_hubs (NIF Fab Lab),https://www.fablabs.io/labs/nif,No action (covered in another file),Low
+58,riidl Fablab,active,"included (medium, active)",https://www.fablabs.io/labs/riidl,See action in fablabs_checked.csv,Low
+59,FabLab CEPT,active,"included (medium, listed)",https://www.fablabs.io/labs/fablabcept,See action in fablabs_checked.csv,Low
+60,AIC Aartech Fablab,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/aicaartechfablab,Listed as 'planned': re-check in a year whether it opened,Low
+61,INIFD Kondhawa Pune,active,duplicate of fablabs (duplicate of INIFD Kondhwa entry 50),https://www.fablabs.io/labs/inifdkondhawaPune,No action (covered in another file),Low
+62,LOGICBRIGADE FAB LAB (Future Thinks),unknown,excluded: logicbrigade.com now redirects to a domain-for-sale page - treated as closed,https://www.fablabs.io/labs/logicbrigade,No action (closed),Low
+63,RoboKriti.India,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/robokriti,Listed as 'planned': re-check in a year whether it opened,Low
+64,Mini Fablab CEC,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/fablabcec,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+65,E4D Banjarapalya,unknown,"included (low, unverified)",https://www.fablabs.io/labs/bpalya,See action in fablabs_checked.csv,Low
+66,Mini FabLab Kerala- GCEK,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/fablabgcek,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+67,"Centre for Advanced CNC and Robotics,. PSG College of Technology",unknown,"included (low, unverified)",https://www.fablabs.io/labs/centreforadvancedcncandrobotics,See action in fablabs_checked.csv,Low
+68,Rajagiri Sunya Fablab,active,duplicate of government_prototyping_hubs (Rajagiri FabLab - Sunya Labs),https://www.fablabs.io/labs/rajagiri,No action (covered in another file),Low
+69,Minvayu,active,"included (low, unverified)",https://www.fablabs.io/labs/minvayu,See action in fablabs_checked.csv,Low
+70,Indian School of Design & Innovation,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/isdi,Listed as 'planned': re-check in a year whether it opened,Low
+71,AKGEC FabLab,active,"included (medium, listed)",https://www.fablabs.io/labs/akgecfablab,See action in fablabs_checked.csv,Low
+72,MINI FABLAB VJCET,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/fablabvjcet,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+73,MINI FABLAB KERALA - MES COLLEGE OF ENGINEERING,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/mesce,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+74,INTO Fab Lab,unknown,"included (low, unverified)",https://www.fablabs.io/labs/INTOFabLab,See action in fablabs_checked.csv,Low
+75,Minifab Kerala Model Engineering College Kochi,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/minifabkeralamodelengineeringcollegekochi,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+76,Mini FabLab MACE,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/fablabmace,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+77,MINI FABLAB KERALA SCTCE TRIVANDRUM,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/SCTCE,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+78,FabLab MACE,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/macefablab,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+79,Mini FABLAB KERALA - CET - Trivandrum,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/minifablabcettrivandrum,Covered by the Kerala Startup Mission list (government hubs) - no action,Low
+80,MINI FABLAB- ADISHANKARA,active,duplicate of government_prototyping_hubs (Adi Shankara FabLab),https://www.fablabs.io/labs/minifabasiet,No action (covered in another file),Low
+81,APJ DREAMLAB TKMCE,active,duplicate of government_prototyping_hubs (TKM FabLab),https://www.fablabs.io/labs/fablabtkmce,No action (covered in another file),Low
+82,Makerspace Manipal,active,"included (low, unverified)",https://www.fablabs.io/labs/makerspacemanipal,See action in fablabs_checked.csv,Low
+83,INIFD College Pune,active,excluded: inifdcollegepune.com now redirects to an unrelated betting site - treated as closed/unverifiable,https://www.fablabs.io/labs/inifdcollegepune,No action (closed),Low
+84,BSDU FabLab,active,"included (low, unverified)",https://www.fablabs.io/labs/bsdufablab,See action in fablabs_checked.csv,Low
+85,Fablab AIC Aartech,active,"included (low, uncertain)",https://www.fablabs.io/labs/aicaartech,See action in fablabs_checked.csv,Low
+86,hackerslab,active,"included (low, doubtful)",https://www.fablabs.io/labs/l1labs,See action in fablabs_checked.csv,Low
+87,Rural lab,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/ruralab,Listed as 'planned': re-check in a year whether it opened,Low
+88,Creative Lab RNTBCI,active,"included (low, unverified)",https://www.fablabs.io/labs/creativelabrntbci,See action in fablabs_checked.csv,Low
+89,Chandigarh,active,"duplicate of fablabs (same Sector 43-B address as Zios Makerspace, entry 46)",https://www.fablabs.io/labs/fablabchandigarh,No action (covered in another file),Low
+90,Destor's Laboratory,planned,excluded: FabLabs.io status 'planned',https://www.fablabs.io/labs/destorslaboratory,Listed as 'planned': re-check in a year whether it opened,Low
+91,Mohali,active,"included (low, unverified)",https://www.fablabs.io/labs/mohali,See action in fablabs_checked.csv,Low
+92,Vigyan Ashram FabLab,corona,"included (high, active)",https://www.fablabs.io/labs/vigyanashram,See action in fablabs_checked.csv,Low
+93,Fab.Forge,active,duplicate of incubators_with_makerspaces (Forge),https://www.fablabs.io/labs/fabforge,No action (covered in another file),Low
+94,The Design Fablab (The Design Village),active,"included (medium, active)",https://www.fablabs.io/labs/thedesignfablab,See action in fablabs_checked.csv,Low
+95,Super Fablab Kerala,active,duplicate of government_prototyping_hubs (Super FabLab Kochi),https://www.fablabs.io/labs/fablabcochin,No action (covered in another file),Low
+96,Denew Labs (Studio Denew),active,"included (low, uncertain)",https://www.fablabs.io/labs/denewlabs,See action in fablabs_checked.csv,Low
+97,CUSAT FabLab (CITTIC TBI),active,"included (medium, listed)",https://www.fablabs.io/labs/cusatfablab,See action in fablabs_checked.csv,Low
+98,IIT Palakkad Technology I-HUB Foundation - Fablab,active,duplicate of higher_ed_institute_makerspaces (IIT Palakkad - IPTIF FabLab on same campus as CSquare lab),https://www.fablabs.io/labs/iptif,No action (covered in another file),Low
+99,Param Maker's Adda - Jayanagar,active,"included (high, active)",https://www.fablabs.io/labs/parammakersaddajayanagara,See action in fablabs_checked.csv,Low
+100,Param Maker's Adda - Whitefield,active,"included (high, active)",https://www.fablabs.io/labs/parammakersaddawhitefieldnallurahalli,See action in fablabs_checked.csv,Low
+101,Param_RapidPrototypingLab,active,"included (low, unverified)",https://www.fablabs.io/labs/paramIRPlab,See action in fablabs_checked.csv,Low
+102,Fab Crescent,active,"included (medium, listed)",https://www.fablabs.io/labs/fabcrescent,See action in fablabs_checked.csv,Low

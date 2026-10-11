@@ -1,0 +1,9 @@
+name,type,city,state,latitude,longitude,address,website,contact,description,verified
+Maker's Asylum,Community,Mumbai,Maharashtra,19.1663,72.8526,Goregaon East,https://www.makersasylum.com,,SAMPLE ROW - community makerspace; verify details,no
+Maker Bhavan Foundation,Community,Mumbai,Maharashtra,19.1000,72.8450,Vile Parle,,,SAMPLE ROW - verify details,no
+Fab Lab Vigyan Ashram,FabLab,Pabal,Maharashtra,18.8200,74.1200,Pabal Village,https://www.vigyanashram.com,,SAMPLE ROW - rural FabLab; verify location and details,no
+Fab Lab Kerala,FabLab,Thiruvananthapuram,Kerala,8.5570,76.8800,Technopark,,,SAMPLE ROW - verify details,no
+Centre for Innovation (CFI),Academic,Chennai,Tamil Nadu,12.9916,80.2336,IIT Madras,https://cfi.iitm.ac.in,,SAMPLE ROW - student-run innovation centre; verify details,no
+CIIE Workshop,Incubator,Ahmedabad,Gujarat,23.0300,72.5300,IIM Ahmedabad,,,SAMPLE ROW - verify details,no
+Atal Tinkering Lab (example),Government,New Delhi,Delhi,28.6139,77.2090,Placeholder location,,,SAMPLE ROW - example ATL entry; replace with real data,no
+Bengaluru Makerspace (example),Community,Bengaluru,Karnataka,12.9716,77.5946,Placeholder location,,,SAMPLE ROW - replace with real data,no
