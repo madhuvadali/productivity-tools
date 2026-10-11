@@ -44,6 +44,38 @@ const map=new maplibregl.Map({
 map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
 map.addControl(new maplibregl.AttributionControl({compact:true,customAttribution:'Locations geocoded with <a href="https://nominatim.org" target="_blank" rel="noopener">Nominatim</a>, <a href="databases/SOURCES.md" target="_blank" rel="noopener">data sources</a>'}));
 map.addControl(new maplibregl.GeolocateControl({}),'top-right');
+
+// On-map category checkboxes, stacked under the zoom/locate buttons in the top-right corner.
+class CategoryFilterControl{
+  onAdd(){
+    this._el=document.createElement('div');
+    this._el.className='maplibregl-ctrl map-filter';
+    return this._el;
+  }
+  onRemove(){ this._el.parentNode?.removeChild(this._el); }
+  build(){
+    this._el.innerHTML=`<div class="map-filter-title">Categories</div>`+allTypes.map((t,i)=>{
+      const id='mf-'+i;
+      return `<label class="map-filter-row" for="${id}">
+        <input type="checkbox" id="${id}" data-t="${esc(t)}" ${activeTypes.has(t)?'checked':''}>
+        <span class="dot" style="background:${colorOf(t)}"></span>
+        <span class="map-filter-label">${esc(t)}</span>
+      </label>`;
+    }).join('');
+    this._el.querySelectorAll('input[type=checkbox]').forEach(cb=>
+      cb.addEventListener('change',()=>{
+        const t=cb.dataset.t;
+        if(cb.checked) activeTypes.add(t);
+        else { activeTypes.delete(t); if(!activeTypes.size) activeTypes=new Set(allTypes); }
+        render(true);
+      }));
+  }
+  sync(){
+    this._el?.querySelectorAll('input[type=checkbox]').forEach(cb=>{ cb.checked=activeTypes.has(cb.dataset.t); });
+  }
+}
+const mapFilter=new CategoryFilterControl();
+map.addControl(mapFilter,'top-right');
 const mapReady=new Promise(r=>map.on('load',r));
 
 async function init(){
@@ -69,6 +101,7 @@ async function init(){
   fillSelect($('state'),uniq(data.map(d=>d.state)),'All states');
   fillCities();
   fillAbout();
+  mapFilter.build();
 
   await mapReady;
   map.addSource('ms',{type:'geojson',data:fc([]),cluster:true,clusterMaxZoom:9,clusterRadius:40});
@@ -142,6 +175,7 @@ function render(fit){
 
   renderChips();
   renderStateBars();
+  mapFilter.sync();
 
   if(map.getSource('ms')) map.getSource('ms').setData(fc(rows.map(d=>({type:'Feature',
     geometry:{type:'Point',coordinates:[d.lng,d.lat]},

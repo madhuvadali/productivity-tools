@@ -4,28 +4,107 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>India Makerspace Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="app">
-  <aside id="sidebar">
-    <header>
-      <h1>India Makerspaces</h1>
-      <p id="count" class="muted"></p>
+  <aside id="sidebar" aria-label="Makerspace list and filters">
+    <button id="sheet-toggle" class="sheet-toggle" aria-expanded="false">Show list</button>
+    <header class="head">
+      <div>
+        <h1>India Makerspace Map</h1>
+        <p id="count" class="muted" aria-live="polite"></p>
+      </div>
+      <button id="about-open" class="text-btn">About &amp; sources</button>
     </header>
+
     <div class="controls">
-      <input id="search" type="search" placeholder="Search name, city, description…" autocomplete="off">
-      <select id="state"><option value="">All states</option></select>
-      <select id="city"><option value="">All cities</option></select>
-      <div id="types" class="chips"></div>
-      <button id="reset" class="link">Reset filters</button>
+      <label class="sr" for="search">Search</label>
+      <input id="search" type="search" placeholder="Search by name, city or description" autocomplete="off">
+      <div id="types" class="chips" role="group" aria-label="Categories"></div>
+
+      <details id="refine">
+        <summary>Refine</summary>
+        <div class="refine-body">
+          <div class="row2">
+            <label>State<select id="state"></select></label>
+            <label>City<select id="city"></select></label>
+          </div>
+          <fieldset>
+            <legend>How well it is verified</legend>
+            <label class="check"><input type="checkbox" class="conf" value="high" checked><span class="badge high">Verified</span></label>
+            <label class="check"><input type="checkbox" class="conf" value="medium" checked><span class="badge medium">Partly verified</span></label>
+            <label class="check"><input type="checkbox" class="conf" value="low" checked><span class="badge low">Unverified</span></label>
+          </fieldset>
+          <label class="check"><input type="checkbox" id="exact"> Exact pins only (hide approximate locations)</label>
+          <button id="reset" class="text-btn">Clear all filters</button>
+        </div>
+      </details>
+
+      <details id="stats">
+        <summary>By state</summary>
+        <ol id="state-bars" class="bars"></ol>
+      </details>
+    </div>
+
+    <div class="list-head">
+      <span id="list-count" class="muted"></span>
+      <label class="sort">Sort
+        <select id="sort">
+          <option value="name">Name</option>
+          <option value="state">State</option>
+          <option value="type">Category</option>
+          <option value="trust">Verification</option>
+        </select>
+      </label>
     </div>
     <ul id="list"></ul>
-    <div class="foot"><span class="fade"></span> faded dot = approximate location · <a href="databases/SOURCES.md" target="_blank">Data sources &amp; methods</a></div>
+    <footer class="foot">
+      <span class="fade-dot" aria-hidden="true"></span> Faded pin: approximate location. Numbers on the map are groups of nearby places; zoom in to see them.
+    </footer>
   </aside>
-  <main id="map"></main>
+  <main id="map" aria-label="Map"></main>
 </div>
+
+<dialog id="about">
+  <div class="about-body">
+    <button id="about-close" class="close" aria-label="Close">×</button>
+    <h2>About this map</h2>
+    <p>This map shows places in India where people can design and build things: makerspaces, tinkering labs, FabLabs and prototyping centres. Every entry was checked against a source, and each popup says how well it is verified and how precise its pin is.</p>
+
+    <h3>What is on the map</h3>
+    <ul id="about-cats" class="about-cats"></ul>
+
+    <h3>How each entry is checked</h3>
+    <dl class="defs">
+      <dt><span class="badge high">Verified</span></dt><dd>Confirmed on the organisation's own website or an official government or university record.</dd>
+      <dt><span class="badge medium">Partly verified</span></dt><dd>Confirmed by a semi-official source (for example the operator's network list or Wikipedia), or the official source gives only part of the address.</dd>
+      <dt><span class="badge low">Unverified</span></dt><dd>Listed by a directory or third-party site, but not yet confirmed by the place itself.</dd>
+    </dl>
+
+    <h3>How pins are placed</h3>
+    <p>Addresses were turned into coordinates with OpenStreetMap's Nominatim. A pin is placed on the building or campus only when the name matches and it lies in the right state and within 25 km of its PIN code. Otherwise the pin falls back to the PIN-code area or town centre and is drawn faded. Some pins were checked by hand.</p>
+
+    <h3>Sources</h3>
+    <ul class="src">
+      <li>Colleges' and institutes' own websites; Anna University, COMEDK, Punjab DTE and WBJEE Board records</li>
+      <li>AICTE IDEA Lab result list (2020-21)</li>
+      <li>Maker Bhavan Foundation's list of Tinkerers' Labs</li>
+      <li>FabLabs.io and Fab Academy (Fab Foundation)</li>
+      <li>Kerala Startup Mission FabLab list; Innovate TN; T-Works; STPI; NIF; iTNT Hub</li>
+      <li>hackerspaces.in, press articles and startupgrantsindia.com, used only as leads</li>
+    </ul>
+    <p>The full register of sources, decisions and dates is in <a href="databases/SOURCES.md" target="_blank" rel="noopener">SOURCES.md</a>.</p>
+
+    <h3>Credits</h3>
+    <p>Map data © OpenStreetMap contributors. Base map by OpenFreeMap. Geocoding by Nominatim. Last checked October 2026.</p>
+  </div>
+</dialog>
+
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="app.js"></script>
 </body>

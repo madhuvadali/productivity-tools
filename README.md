@@ -6,7 +6,7 @@ A collection of small, independent productivity tools. Each tool lives in its ow
 
 | Tool | Description | Status |
 |------|-------------|--------|
-| _(none yet)_ | | |
+| [makerspace-map](tools/makerspace-map) | Interactive map of makerspaces, FabLabs and prototyping hubs across India | active |
 
 Add a row here whenever you add a new tool folder.
 
