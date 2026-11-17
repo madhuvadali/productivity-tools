@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viva Examiner</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:#1B1F2A;font:15px/1.4 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+  h1{margin:0;font-size:24px}
+  h2{margin:0;font-size:18px}
+  button{font:inherit;color:inherit;cursor:pointer}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .btn{min-height:44px;padding:0 14px;border:1px solid #C9C6BC;background:#fff;border-radius:8px}
+  .btn.dark{background:#1B1F2A;border-color:#1B1F2A;color:#fff}
+  .btn.primary{min-height:48px;padding:0 28px;border:0;background:#2B4FD8;color:#fff;font-size:16px;font-weight:600}
+  .btn.out{flex:1;min-height:52px;border:1px solid #1B1F2A;font-weight:600}
+  .btn.out:hover:not(:disabled){background:#F1F0EB}
+  .link{min-height:44px;padding:0;border:0;background:none;color:#2B4FD8;text-decoration:underline}
+  .muted{color:#5B6270}
+  .small{font-size:13px}
+  input[type=text],input[type=number]{min-height:44px;border:1px solid #C9C6BC;border-radius:8px;padding:0 12px;font:inherit;width:100%}
+  input[type=checkbox]{width:20px;height:20px;accent-color:#1B1F2A;flex:none}
+  .wrap{display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;padding:32px;max-width:1200px;margin:0 auto}
+  .col-students{flex:0 0 320px;max-width:100%}
+  .col-main{flex:1 1 420px;max-width:640px;min-width:0;display:flex;flex-direction:column;gap:32px}
+  .rule{border-top:1px solid #1B1F2A}
+  .row{display:flex;align-items:center;gap:12px;min-height:44px;border-bottom:1px solid #E4E1D8}
+  .row .grow{flex:1;min-width:0}
+  .topbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #1B1F2A;padding:16px 0;margin:0 32px}
+  .timer{font-size:36px;font-weight:700;font-variant-numeric:tabular-nums}
+  .timer.over{color:#A8321F}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:40px;align-items:start;padding:32px}
+  .card{display:flex;flex-direction:column;gap:16px}
+  .q{font-size:20px;font-weight:600;line-height:1.35;white-space:pre-wrap}
+  .ans{border-top:1px solid #E4E1D8;padding-top:12px;white-space:pre-wrap}
+  .btns{display:flex;gap:8px}
+  .field{display:flex;flex-direction:column;gap:4px}
+  .banner{margin:24px 32px 0;padding:12px 0;border-bottom:1px solid #E4E1D8;font-weight:600}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<input type="file" id="fq" accept=".txt,text/plain" hidden>
+<input type="file" id="fs" accept=".csv,.txt,text/csv" hidden>
+
+<script>
+'use strict';
+/* ---------- state ---------- */
+const KEY = 'vivaExaminer.v1';
+const defaults = () => ({
+  questions: [], qFile: '', students: [], sFile: '',
+  settings: { maxQ: 5, maxMin: 10, noRepeat: true, notes: true, replace: true },
+  records: [], selected: [], session: null, view: 'setup'
+});
+function load() {
+  try {
+    const r = JSON.parse(localStorage.getItem(KEY));
+    if (r) return Object.assign(defaults(), r, { settings: Object.assign(defaults().settings, r.settings) });
+  } catch (e) {}
+  return defaults();
+}
+let S = load();
+if (S.session) { S.session.running = false; S.session.lastTick = Date.now(); } else if (S.view === 'exam') S.view = 'setup';
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+/* ---------- helpers ---------- */
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const recsOf = id => S.records.filter(r => r.sid === id);
+const scoreOf = id => recsOf(id).reduce((a, r) => a + r.score, 0);
+const asked = (id, q) => S.records.some(r => r.sid === id && r.q === q);
+const pad = n => String(n).padStart(2, '0');
+const fmt = ms => { const s = Math.floor(ms / 1000); return pad(Math.floor(s / 60)) + ':' + pad(s % 60); };
+const isDone = id => recsOf(id).length >= S.settings.maxQ;
+
+/* ---------- parsing ---------- */
+function parseBank(text) {
+  const out = []; let cur = null, field = null;
+  for (const raw of text.replace(/^﻿/, '').replace(/\r/g, '').split('\n')) {
+    const m = raw.match(/^\s*(Q|Question|A|Answer)\s*:\s?(.*)$/i);
+    if (m) {
+      if (m[1][0].toUpperCase() === 'Q') { if (cur) out.push(cur); cur = { q: m[2], a: '' }; field = 'q'; }
+      else if (cur) { field = 'a'; cur.a = m[2]; }
+    } else if (cur && field) cur[field] += '\n' + raw;
+  }
+  if (cur) out.push(cur);
+  return out.map(x => ({ q: x.q.trim(), a: x.a.trim() })).filter(x => x.q && x.a);
+}
+function parseCSV(text) {
+  const rows = []; let row = [], cell = '', q = false;
+  text = text.replace(/^﻿/, '');
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += c; }
+    else if (c === '"') q = true;
+    else if (c === ',') { row.push(cell); cell = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += c;
+  }
+  if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter(r => r.some(c => c.trim() !== ''));
+}
+function parseStudents(text) {
+  const rows = parseCSV(text); if (!rows.length) return [];
+  const head = rows[0].map(c => c.trim().toLowerCase());
+  let ni = head.findIndex(h => ['name', 'student', 'student name'].includes(h));
+  let ri = head.findIndex(h => ['roll', 'roll no', 'roll no.', 'roll number', 'roll_no', 'id'].includes(h));
+  let data = rows;
+  if (ni >= 0 || ri >= 0) { data = rows.slice(1); if (ni < 0) ni = ri === 0 ? 1 : 0; }
+  else if (rows[0].length > 1) { ri = 0; ni = 1; } else { ni = 0; ri = -1; }
+  const seen = {};
+  return data.map(r => ({ roll: ri >= 0 ? (r[ri] || '').trim() : '', name: (r[ni] || '').trim() }))
+    .filter(s => s.name || s.roll)
+    .map(s => {
+      const name = s.name || s.roll; let id = s.roll + '|' + name;
+      seen[id] = (seen[id] || 0) + 1; if (seen[id] > 1) id += '#' + seen[id];
+      return { id, roll: s.roll, name };
+    });
+}
+
+/* ---------- question drawing ---------- */
+function draw(card, exclude) {
+  exclude = exclude || [];
+  const shown = new Set();
+  S.session.cards.forEach(c => { if (c.current) shown.add(c.current.q.q); c.queue.forEach(x => shown.add(x.q.q)); });
+  const ok = (q, strict) => !exclude.includes(q.q) && !(S.settings.noRepeat && asked(card.sid, q.q)) && (!strict || !shown.has(q.q));
+  let pool = S.questions.filter(q => ok(q, true));
+  if (!pool.length) pool = S.questions.filter(q => ok(q, false));
+  if (!pool.length) return null;
+  return { q: pool[Math.floor(Math.random() * pool.length)], passedFrom: '', skippedBy: [] };
+}
+function advance(card, exclude) {
+  card.note = ''; card.current = null;
+  if (isDone(card.sid)) { card.queue = []; return; }
+  while (card.queue.length) {
+    const n = card.queue.shift();
+    if (!(S.settings.noRepeat && asked(card.sid, n.q.q))) { card.current = n; return; }
+  }
+  card.current = draw(card, exclude);
+}
+
+/* ---------- session actions ---------- */
+function startSession() {
+  const ids = S.students.filter(s => S.selected.includes(s.id) && !isDone(s.id)).map(s => s.id);
+  if (!ids.length || !S.questions.length) return;
+  S.session = { id: Date.now().toString(36), ids, elapsedMs: 0, running: true, lastTick: Date.now(), beeped: false, finished: false,
+    cards: ids.map(sid => ({ sid, current: null, queue: [], note: '' })) };
+  S.session.cards.forEach(c => { c.current = draw(c); });
+  initAudio(); S.view = 'exam'; save(); render();
+}
+function mark(sid, result) {
+  const ses = S.session, card = ses && ses.cards.find(c => c.sid === sid);
+  if (!card || !card.current) return;
+  const st = S.students.find(s => s.id === sid) || { roll: '', name: sid };
+  const cur = card.current, single = ses.cards.length === 1;
+  let res = result, via = false;
+  if (result === 'Skip' && single) { res = 'Wrong'; via = true; }
+  S.records.push({ sid, roll: st.roll, name: st.name, q: cur.q.q, a: cur.q.a, result: res, score: res === 'Right' ? 1 : 0,
+    note: card.note.trim(), viaSkip: via, passedFrom: cur.passedFrom, time: new Date().toISOString(), session: ses.id });
+  if (res === 'Skip') {
+    const skipped = cur.skippedBy.concat(sid), idx = ses.cards.indexOf(card);
+    for (let k = 1; k < ses.cards.length; k++) {
+      const t = ses.cards[(idx + k) % ses.cards.length];
+      if (skipped.includes(t.sid) || isDone(t.sid) || (S.settings.noRepeat && asked(t.sid, cur.q.q))) continue;
+      t.queue.push({ q: cur.q, passedFrom: st.name, skippedBy: skipped }); break;
+    }
+  }
+  advance(card, res === 'Skip' ? [cur.q.q] : []);
+  ses.finished = ses.cards.every(c => !c.current);
+  if (ses.finished) ses.running = false;
+  save(); render();
+}
+function replaceQ(sid) {
+  const card = S.session.cards.find(c => c.sid === sid);
+  if (!card || !card.current) return;
+  const n = draw(card, [card.current.q.q]);
+  if (!n) { alert('There is no other question available for this student.'); return; }
+  card.current = n; save(); render();
+}
+function togglePause() {
+  const s = S.session; s.running = !s.running; s.lastTick = Date.now(); initAudio(); save(); render();
+}
+function endSession() {
+  if (!S.session.finished && !confirm('End this session? Answers already marked are kept.')) return;
+  S.session = null; S.view = 'setup'; save(); render();
+}
+
+/* ---------- timer + beep ---------- */
+let actx = null, tickN = 0;
+function initAudio() { try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume(); } catch (e) {} }
+function beep() {
+  try { initAudio(); [0, 0.35, 0.7].forEach(t => { const o = actx.createOscillator(), g = actx.createGain();
+    o.frequency.value = 880; g.gain.value = 0.2; o.connect(g); g.connect(actx.destination); o.start(actx.currentTime + t); o.stop(actx.currentTime + t + 0.2); }); } catch (e) {}
+}
+function updateTimer() {
+  const el = document.getElementById('timer'); if (!el || !S.session) return;
+  const over = S.session.elapsedMs >= S.settings.maxMin * 60000;
+  el.className = 'timer' + (over ? ' over' : '');
+  el.firstChild.nodeValue = fmt(S.session.elapsedMs) + ' ';
+  const lim = document.getElementById('limit'); if (lim) lim.textContent = '/ ' + fmt(S.settings.maxMin * 60000) + (over ? ' · time is up' : '');
+}
+setInterval(() => {
+  const s = S.session; if (!s) return;
+  const now = Date.now();
+  if (s.running) s.elapsedMs += now - s.lastTick;
+  s.lastTick = now;
+  updateTimer();
+  if (s.running && !s.beeped && s.elapsedMs >= S.settings.maxMin * 60000) { s.beeped = true; beep(); }
+  if (++tickN % 4 === 0) save();
+}, 250);
+
+/* ---------- export ---------- */
+const csvCell = v => { v = String(v == null ? '' : v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+function download(name, rows) {
+  const blob = new Blob(['﻿' + rows.map(r => r.map(csvCell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+const stamp = () => { const d = new Date(); return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes()); };
+const when = iso => { const d = new Date(iso); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); };
+function exportDetail() {
+  const order = id => { const i = S.students.findIndex(s => s.id === id); return i < 0 ? 1e9 : i; };
+  const recs = S.records.map((r, i) => ({ r, i })).sort((x, y) => order(x.r.sid) - order(y.r.sid) || x.i - y.i);
+  const count = {};
+  const rows = [['Roll', 'Name', 'Question no.', 'Question', 'Expected answer', 'Result', 'Score', 'Note', 'Skipped by student (auto Wrong)', 'Passed on from', 'Time', 'Session']];
+  recs.forEach(({ r }) => { count[r.sid] = (count[r.sid] || 0) + 1;
+    rows.push([r.roll, r.name, count[r.sid], r.q, r.a, r.result, r.score, r.note, r.viaSkip ? 'Yes' : '', r.passedFrom, when(r.time), r.session]); });
+  download('viva-results-' + stamp() + '.csv', rows);
+}
+function exportSummary() {
+  const rows = [['Roll', 'Name', 'Questions', 'Right', 'Wrong', 'Skip', 'Total score']];
+  S.students.forEach(s => { const rs = recsOf(s.id), n = x => rs.filter(r => r.result === x).length;
+    rows.push([s.roll, s.name, rs.length, n('Right'), n('Wrong'), n('Skip'), scoreOf(s.id)]); });
+  download('viva-summary-' + stamp() + '.csv', rows);
+}
+
+/* ---------- views ---------- */
+function statusText(id) {
+  const n = recsOf(id).length; if (!n) return '';
+  return n >= S.settings.maxQ ? 'Done · ' + scoreOf(id) + '/' + S.settings.maxQ : n + ' asked · ' + scoreOf(id);
+}
+function viewSetup() {
+  const st = S.settings, selPending = S.students.filter(s => S.selected.includes(s.id) && !isDone(s.id));
+  const live = S.session && !S.session.finished;
+  let why = '';
+  if (!S.questions.length) why = 'Load a question bank.'; else if (!S.students.length) why = 'Load a student list.'; else if (!selPending.length) why = 'Select at least one student.';
+  const can = !why;
+  return `<div class="wrap">
+  <div class="col-students">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+      <h2>Students</h2><span class="small muted">${selPending.length} of ${S.students.length} selected</span></div>
+    <div class="rule">${S.students.length ? S.students.map(s => { const d = isDone(s.id); return `<label class="row">
+      <input type="checkbox" data-sel="${esc(s.id)}" ${S.selected.includes(s.id) && !d ? 'checked' : ''} ${d ? 'disabled' : ''}>
+      <span class="grow">${esc(s.name)}${s.roll ? ' <span class="small muted">' + esc(s.roll) + '</span>' : ''}</span>
+      <span class="small muted">${esc(statusText(s.id))}</span></label>`; }).join('') : '<div class="row muted">No students loaded.</div>'}</div>
+  </div>
+  <div class="col-main">
+    <h1>Viva Examiner</h1>
+    <div><h2 style="margin-bottom:8px">Files</h2><div class="rule">
+      <div class="row" style="min-height:52px;justify-content:space-between"><span>Question bank <span class="muted">· ${S.questions.length ? esc(S.qFile) + ' · ' + S.questions.length + ' questions' : 'not loaded'}</span></span>
+        <button class="btn" data-act="loadQ">${S.questions.length ? 'Change' : 'Choose file'}</button></div>
+      <div class="row" style="min-height:52px;justify-content:space-between"><span>Student list <span class="muted">· ${S.students.length ? esc(S.sFile) + ' · ' + S.students.length + ' students' : 'not loaded'}</span></span>
+        <button class="btn" data-act="loadS">${S.students.length ? 'Change' : 'Choose file'}</button></div></div></div>
+    <div><h2 style="margin-bottom:8px">Settings</h2><div class="rule" style="padding-top:16px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;flex-wrap:wrap;gap:16px">
+        <label class="field">Questions per student<input type="number" min="1" style="width:160px" data-set="maxQ" value="${st.maxQ}"></label>
+        <label class="field">Max time (minutes)<input type="number" min="1" style="width:160px" data-set="maxMin" value="${st.maxMin}"></label></div>
+      <label class="row" style="border:0"><input type="checkbox" data-flag="noRepeat" ${st.noRepeat ? 'checked' : ''}>No repeat questions per student</label>
+      <label class="row" style="border:0"><input type="checkbox" data-flag="notes" ${st.notes ? 'checked' : ''}>Notes on each question</label>
+      <label class="row" style="border:0"><input type="checkbox" data-flag="replace" ${st.replace ? 'checked' : ''}>Allow replacing a question</label>
+      <div class="small muted">Right = 1, Wrong = 0, Skip = 0. In a group, a skipped question goes to the next student. With one student, a skip is recorded as Wrong.</div>
+    </div></div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:20px">
+      ${live ? '<button class="btn primary" data-act="resume">Resume session</button>' : ''}
+      <button class="btn ${live ? '' : 'primary'}" data-act="start" ${can ? '' : 'disabled'}>${live ? 'Start new session' : 'Start session'}</button>
+      ${can ? '' : '<span class="small muted">' + why + '</span>'}
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px">
+      <button class="link" data-act="export" ${S.records.length ? '' : 'disabled'}>Export results (CSV)</button>
+      <button class="link" data-act="exportSummary" ${S.records.length ? '' : 'disabled'}>Export summary (CSV)</button>
+      <button class="link" data-act="clear" ${S.records.length ? '' : 'disabled'}>Clear all results</button>
+    </div>
+  </div></div>`;
+}
+function viewExam() {
+  const ses = S.session, st = S.settings, single = ses.cards.length === 1;
+  const card = c => {
+    const stu = S.students.find(s => s.id === c.sid) || { name: c.sid }, n = recsOf(c.sid).length, cur = c.current;
+    let body;
+    if (cur) {
+      body = `${cur.passedFrom ? `<div class="small muted" style="margin-top:-8px">Passed on from ${esc(cur.passedFrom)}</div>` : ''}
+      <div class="q">${esc(cur.q.q)}</div>
+      <div class="ans"><div class="small muted" style="margin-bottom:4px">Answer</div>${esc(cur.q.a)}</div>
+      ${st.notes ? `<input type="text" placeholder="Note (optional)" aria-label="Note" data-note="${esc(c.sid)}" value="${esc(c.note)}">` : ''}
+      <div class="btns">
+        <button class="btn out" data-act="mark" data-res="Right" data-id="${esc(c.sid)}">Right (1)</button>
+        <button class="btn out" data-act="mark" data-res="Wrong" data-id="${esc(c.sid)}">Wrong (0)</button>
+        <button class="btn out" data-act="mark" data-res="Skip" data-id="${esc(c.sid)}">${single ? 'Don’t know (0)' : 'Skip (0)'}</button>
+      </div>
+      ${st.replace ? `<button class="link" style="align-self:flex-start" data-act="replace" data-id="${esc(c.sid)}">Replace question</button>` : ''}
+      ${c.queue.length ? `<div class="small muted">Next: passed on from ${esc(c.queue[0].passedFrom)}</div>` : ''}`;
+    } else {
+      body = `<div class="q">${isDone(c.sid) ? 'Finished.' : 'No more questions available in the bank.'}</div>
+      <div class="muted">Score ${scoreOf(c.sid)} out of ${st.maxQ}.</div>`;
+    }
+    return `<div class="card"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+      <h2>${esc(stu.name)}</h2><span class="small muted">${cur ? 'Q' + (n + 1) + ' of ' + st.maxQ + ' · ' : ''}Score ${scoreOf(c.sid)}</span></div>${body}</div>`;
+  };
+  return `<div class="topbar">
+    <div style="display:flex;align-items:center;gap:16px"><button class="btn" data-act="toSetup">Setup</button>
+      <span class="muted">${ses.cards.length} student${single ? '' : 's'} · ${st.maxQ} questions each</span></div>
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <div id="timer" class="timer">${fmt(ses.elapsedMs)} <span id="limit" class="small muted" style="font-weight:400;font-size:15px"></span></div>
+      <button class="btn" data-act="pause" ${ses.finished ? 'disabled' : ''}>${ses.running ? 'Pause' : 'Resume'}</button>
+      <button class="btn dark" data-act="end">${ses.finished ? 'Close session' : 'End session'}</button></div></div>
+    ${ses.finished ? '<div class="banner">All students have finished. Use Export on the Setup screen to download the results.</div>' : ''}
+    <div class="grid">${ses.cards.map(card).join('')}</div>`;
+}
+function render() {
+  if (S.view === 'exam' && !S.session) S.view = 'setup';
+  document.getElementById('app').innerHTML = S.view === 'exam' ? viewExam() : viewSetup();
+  updateTimer();
+}
+
+/* ---------- events ---------- */
+const app = document.getElementById('app'), fq = document.getElementById('fq'), fs = document.getElementById('fs');
+app.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const a = b.dataset.act, id = b.dataset.id;
+  if (a === 'loadQ') fq.click();
+  else if (a === 'loadS') fs.click();
+  else if (a === 'start') { if (!S.session || S.session.finished || confirm('Start a new session? The current session’s saved answers are kept, but its timer is discarded.')) startSession(); }
+  else if (a === 'resume') { S.view = 'exam'; save(); render(); }
+  else if (a === 'toSetup') { if (S.session) S.session.running = false; S.view = 'setup'; save(); render(); }
+  else if (a === 'pause') togglePause();
+  else if (a === 'end') endSession();
+  else if (a === 'mark') mark(id, b.dataset.res);
+  else if (a === 'replace') replaceQ(id);
+  else if (a === 'export') exportDetail();
+  else if (a === 'exportSummary') exportSummary();
+  else if (a === 'clear') { if (confirm('Delete ALL saved answers? This cannot be undone. Export first if you need them.')) { S.records = []; S.session = null; S.view = 'setup'; save(); render(); } }
+});
+app.addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.sel !== undefined) { const id = t.dataset.sel; S.selected = S.selected.filter(x => x !== id); if (t.checked) S.selected.push(id); save(); render(); }
+  else if (t.dataset.set) { const v = Math.max(1, parseInt(t.value, 10) || 1); S.settings[t.dataset.set] = v; save(); render(); }
+  else if (t.dataset.flag) { S.settings[t.dataset.flag] = t.checked; save(); render(); }
+});
+app.addEventListener('input', e => {
+  const sid = e.target.dataset && e.target.dataset.note; if (sid === undefined) return;
+  const c = S.session && S.session.cards.find(x => x.sid === sid); if (c) c.note = e.target.value;
+});
+fq.addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  const qs = parseBank(await f.text()); e.target.value = '';
+  if (!qs.length) { alert('No questions found. Each entry needs a line starting "Q:" followed by a line starting "A:".'); return; }
+  S.questions = qs; S.qFile = f.name; save(); render();
+});
+fs.addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  const list = parseStudents(await f.text()); e.target.value = '';
+  if (!list.length) { alert('No students found. Use a CSV with a "roll,name" header, or one name per line.'); return; }
+  S.students = list; S.sFile = f.name;
+  S.selected = S.selected.filter(id => list.some(s => s.id === id));
+  if (S.session && !S.session.ids.every(id => list.some(s => s.id === id))) { S.session = null; S.view = 'setup'; }
+  save(); render();
+});
+window.addEventListener('beforeunload', save);
+render();
+</script>
+</body>
+</html>

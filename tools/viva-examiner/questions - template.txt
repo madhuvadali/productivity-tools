@@ -1,0 +1,17 @@
+Q: What is the difference between precision and recall?
+A: Precision is the fraction of predicted positives that are correct; recall is the fraction of actual positives that were found.
+
+Q: Why do we normalise features before gradient descent?
+A: It puts features on a similar scale so the loss surface is better conditioned and gradient descent converges faster.
+
+Q: State the central limit theorem in one sentence.
+A: The distribution of sample means approaches a normal distribution as the sample size grows, regardless of the population distribution.
+
+Q: What is overfitting?
+A: When a model learns noise in the training data and performs poorly on unseen data.
+
+Q: What does regularisation do?
+A: It penalises model complexity to reduce overfitting.
+
+Q: What is a p-value?
+A: The probability of observing data at least as extreme as the sample, assuming the null hypothesis is true.
